@@ -1,0 +1,26 @@
+// filepath: /Users/gdsmac1407/Desktop/NextJS/FoodBlogProject/food-blog-server/tsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@constants": ["src/constants"],
+      "@controllers": ["src/controllers"],
+      "@models": ["src/models"],
+      "@services": ["src/services"],
+      "@utils": ["src/utils"],
+      "@routes": ["src/routes"],
+      "@middlewares": ["src/middlewares"],
+      "@config": ["src/config/*"]
+    },
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "target": "ES2020",
+    "outDir": "dist",
+    "rootDir": "src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
+}
