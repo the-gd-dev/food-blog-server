@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import { HTTP_STATUS_CODES } from "@constants";
+import { SUCCESS } from "@constants";
 
 export const getUser = async (req: Request, res: Response) => {
-  res.status(HTTP_STATUS_CODES.SUCCESS).json({ data: {} });
+  res.status(SUCCESS.code).json({ ...SUCCESS, data: {} });
 };
 
 export const createUser = async (req: Request, res: Response) => {
-  res.status(HTTP_STATUS_CODES.CREATED).json({ data: {} });
+  res.status(SUCCESS.code).json({ ...SUCCESS, data: {} });
 };
