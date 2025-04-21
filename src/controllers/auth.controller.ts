@@ -1,17 +1,16 @@
-import { Request, Response } from "express";
 import {
-  SUCCESS,
-  CREATED,
-  BAD_REQUEST,
   AUTHORIZED,
-  UNAUTHORIZED,
-  INTERNAL_ERROR,
+  BAD_REQUEST,
+  CREATED,
   NOT_FOUND,
+  SUCCESS,
+  UNAUTHORIZED,
 } from "@constants";
-import jwt from "jsonwebtoken";
 import { RevokedToken, User } from "@models";
 import { formattedYupErrors, loginSchema, registerSchema } from "@utils";
 import argon2 from "argon2";
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 
 /**
  * Handles user login requests.
