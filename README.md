@@ -18,15 +18,16 @@ A beautiful, responsive **Food Blog** built with **Next.js**, where you can expl
 
 ## 🚀 Tech Stack
 
-| Technology     | Purpose                       |
-| -------------- | ----------------------------- |
-| Node.js        | Server Side Scripting         |
-| Express.js     | Node.js framework             |
-| MongoDB        | Database                      |
-| TypeScript     | Static typing                 |
-| JSON Web Token | Authentication Token          |
-| Argon2         | Hashing and Password Security |
-
+| Technology       | Purpose                                |
+| ---------------- | -------------------------------------- |
+| Node.js          | Server-side JavaScript runtime        |
+| Express.js       | Web framework for building APIs       |
+| MongoDB          | NoSQL database for data storage       |
+| TypeScript       | Strongly typed programming language   |
+| JSON Web Token   | Secure user authentication            |
+| Argon2           | Password hashing and security         |
+| Multer           | Middleware for file uploads           |
+| Jest             | Testing framework for unit tests      |
 ---
 
 ## 📷 Screenshots
