@@ -6,9 +6,12 @@ import {
   AUTHORIZED,
   UNAUTHORIZED,
   INTERNAL_ERROR,
+  NOT_FOUND,
 } from "@constants";
 import jwt from "jsonwebtoken";
-import { RevokedToken } from "@models";
+import { RevokedToken, User } from "@models";
+import { formattedYupErrors, loginSchema, registerSchema } from "@utils";
+import argon2 from "argon2";
 
 /**
  * Handles user login requests.
@@ -21,16 +24,34 @@ import { RevokedToken } from "@models";
  * @returns A JSON response with the appropriate status and token.
  */
 export const login = async (req: Request, res: Response) => {
-  if (!req.body.email || !req.body.password) {
-    return res.status(BAD_REQUEST.code).json(BAD_REQUEST);
-  }
-  const token = jwt.sign(
-    { email: req.body.email },
-    process.env.JWT_SECRET || "",
-    { expiresIn: "30days" }
-  );
+  try {
+    await loginSchema.validate(req.body, { abortEarly: false });
+    const email = String(req?.body?.email) || "";
+    const password = String(req?.body?.password) || "";
 
-  res.status(SUCCESS.code).json({ ...SUCCESS, token: token });
+    const user = await User.findOne({ email });
+    const USER_NOT_FOUND = "User details not matched!";
+
+    // user details not found in db
+    if (!user) {
+      return res
+        .status(NOT_FOUND.code)
+        .json({ ...NOT_FOUND, message: USER_NOT_FOUND });
+    }
+
+    // password hash not matched!
+    const isValidPass = await argon2.verify(user.password, password);
+    if (!isValidPass) {
+      return res
+        .status(BAD_REQUEST.code)
+        .json({ ...BAD_REQUEST, message: USER_NOT_FOUND });
+    }
+
+    return res.status(SUCCESS.code).json({ ...SUCCESS, data: {} });
+  } catch (err: any) {
+    const validation = formattedYupErrors(err);
+    return res.status(validation.code).json(validation);
+  }
 };
 
 /**
@@ -44,9 +65,23 @@ export const login = async (req: Request, res: Response) => {
  */
 export const register = async (req: Request, res: Response) => {
   try {
-    res.status(CREATED.code).json({ ...CREATED, data: {} });
-  } catch (error) {
-    res.status(INTERNAL_ERROR.code).json({ ...INTERNAL_ERROR, error: error });
+    await registerSchema.validate(req.body, {
+      abortEarly: false,
+    });
+    await User.create({
+      ...req.body,
+      password: await argon2.hash(req.body.password),
+    });
+    return res.status(CREATED.code).json({ ...CREATED, data: {} });
+  } catch (err: any) {
+    if (err.code === 11000) {
+      return res.status(BAD_REQUEST.code).json({
+        ...BAD_REQUEST,
+        errors: { email: ["Please use a different email address."] },
+      });
+    }
+    const validation = formattedYupErrors(err);
+    return res.status(validation.code).json(validation);
   }
 };
 

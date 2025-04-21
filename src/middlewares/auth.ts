@@ -41,7 +41,6 @@ export const authenticateUser = async (
     req.user = decoded as string | jwt.JwtPayload;
     next();
   } catch (error) {
-    console.log(error);
     return res.status(UNAUTHORIZED.code).json(UNAUTHORIZED);
   }
 };
