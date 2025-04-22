@@ -45,8 +45,23 @@ export const login = async (req: Request, res: Response) => {
         .status(BAD_REQUEST.code)
         .json({ ...BAD_REQUEST, message: USER_NOT_FOUND });
     }
+    const jwtToken = jwt.sign(
+      {
+        email: user.email,
+      },
+      process?.env?.JWT_SECRET!,
+      { expiresIn: "30d" }
+    );
 
-    return res.status(SUCCESS.code).json({ ...SUCCESS, data: {} });
+    return res.status(SUCCESS.code).json({
+      ...SUCCESS,
+      data: {
+        token: jwtToken,
+        expiresIn: new Date(
+          Date.now() + 30 * 24 * 60 * 60 * 1000
+        ).toISOString(),
+      },
+    });
   } catch (err: any) {
     const validation = formattedYupErrors(err);
     return res.status(validation.code).json(validation);
@@ -121,8 +136,20 @@ export const changePassword = async (req: Request, res: Response) => {
  */
 export const verify = async (req: Request, res: Response) => {
   const token: string = req.headers.authorization?.split(" ")[1] || "";
-  const decoded = jwt.verify(token, process.env.JWT_SECRET || "");
-  res.status(AUTHORIZED.code).json({ ...AUTHORIZED, data: decoded });
+  const decoded: any = jwt.verify(token, process.env.JWT_SECRET || "");
+  const userData = await User.findOne({ email: decoded?.email });
+  if (!userData) {
+    res.status(UNAUTHORIZED.code).json({ ...UNAUTHORIZED });
+  }
+  res.status(AUTHORIZED.code).json({
+    ...AUTHORIZED,
+    data: {
+      name: userData?.name ?? "",
+      username: userData?.username ?? "",
+      email: userData?.email ?? "",
+      profilePicture: userData?.profilePicture ?? "",
+    },
+  });
 };
 
 /**
