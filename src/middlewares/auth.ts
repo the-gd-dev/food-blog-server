@@ -1,7 +1,8 @@
 import { UNAUTHORIZED } from "@constants";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { RevokedToken } from "@models";
+import { RevokedToken, User } from "@models";
+import { excludeKeysFromObject } from "@utils";
 
 declare global {
   namespace Express {
@@ -10,6 +11,8 @@ declare global {
     }
   }
 }
+
+const excludeKeys = ["password", "__v", "createdAt", "updatedAt"];
 
 /**
  * Middleware function to handle authentication-related requests.
@@ -32,13 +35,18 @@ export const authenticateUser = async (
 
   const isTokenExists = await RevokedToken.findOne({ token: token });
 
-  if (isTokenExists) {
-    return res.status(UNAUTHORIZED.code).json(UNAUTHORIZED);
-  }
+  if (isTokenExists) return res.status(UNAUTHORIZED.code).json(UNAUTHORIZED);
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "");
-    req.user = decoded as string | jwt.JwtPayload;
+    const decoded: any = jwt.verify(token, process.env.JWT_SECRET || "");
+    const userData = await User.findOne({ email: decoded.email });
+
+    //no user related to email id.
+    if (!userData) return res.status(UNAUTHORIZED.code).json(UNAUTHORIZED);
+
+    //set user data to request.
+    req.user = excludeKeysFromObject(userData.toObject(), excludeKeys);
+
     next();
   } catch (error) {
     return res.status(UNAUTHORIZED.code).json(UNAUTHORIZED);
