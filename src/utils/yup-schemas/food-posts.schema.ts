@@ -2,7 +2,7 @@ import * as yup from "yup";
 
 export const createFoodPostSchema = yup.object({
   title: yup.string().required("Food post title is required."),
-  imageUrl: yup.string().required("Food image is required."),
+  imageUrl: yup.string().url('Image is invalid.').required("Food image is required."),
   description: yup
     .string()
     .max(300)

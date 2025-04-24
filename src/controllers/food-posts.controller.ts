@@ -1,6 +1,10 @@
 import { INTERNAL_ERROR, SUCCESS } from "@constants";
 import { FoodPost } from "@models";
-import { createFoodPostSchema, formattedYupErrors } from "@utils";
+import {
+  createFoodPostSchema,
+  excludeKeysFromObject,
+  formattedYupErrors,
+} from "@utils";
 import { Request, Response } from "express";
 
 /**
@@ -31,16 +35,14 @@ export const getAll = async (req: Request, res: Response) => {
 export const createPost = async (req: Request, res: Response) => {
   try {
     await createFoodPostSchema.validate(req.body, { abortEarly: false });
-    const newPost = await FoodPost.create({
-      ...req.body,
-      postedBy: (req?.user as any)?._id,
+    await FoodPost.create({
+      ...excludeKeysFromObject(req.body, ["_id", "id"]),
+      postedBy: (req?.user as any)?._id.toString(),
     });
-    console.log("New Post", newPost);
-
     return res.status(SUCCESS.code).json({ ...SUCCESS });
   } catch (error) {
     const validationError = formattedYupErrors(error);
-    return res.status(validationError.code).json({ ...validationError });
+    return res.status(validationError.code).json({ ...validationError, error });
   }
 };
 
