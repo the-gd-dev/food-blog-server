@@ -36,3 +36,6 @@ out/
 *.bak
 *.tmp
 *.temp
+
+#image-upload
+uploads

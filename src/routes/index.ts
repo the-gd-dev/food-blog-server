@@ -1,8 +1,16 @@
+import { authenticateUser } from "@middlewares";
 import { Router } from "express";
-import userRoutes from "./user.routes";
+import fs from "fs";
+import path from "path";
 import authRoutes from "./auth.routes";
 import foodRoutes from "./food.routes";
-import { authenticateUser } from "@middlewares";
+import userRoutes from "./user.routes";
+
+// Ensure uploads folder exists
+const uploadsPath = path.join(__dirname, "../..", "uploads");
+if (!fs.existsSync(uploadsPath)) {
+  fs.mkdirSync(uploadsPath);
+}
 
 const router = Router();
 
