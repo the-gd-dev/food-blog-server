@@ -2,6 +2,7 @@ import {
   createPost,
   deletePost,
   getAll,
+  getAllComments,
   getPost,
   updatePost,
   uploadFoodImage,
@@ -12,6 +13,7 @@ import { Router } from "express";
 
 const router = Router();
 router.get("/", getAll);
+router.get("/:postId/comments", getAllComments);
 router.post("/create", authenticateUser, createPost);
 router.put("/:id/update", authenticateUser, updatePost);
 router.get("/:id", getPost);

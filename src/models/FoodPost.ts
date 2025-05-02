@@ -6,12 +6,19 @@ const FoodPostSchema = new Schema(
     description: { type: String, required: true },
     postedBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     likes: { type: Number, default: 0 },
-    comments: { type: Number, default: 0 },
+
     datePosted: { type: String, default: null },
     foodCategory: { type: String, default: null },
     foodPreference: { type: String, default: null },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
-export const FoodPost = model("food-posts", FoodPostSchema);
+FoodPostSchema.virtual("comments", {
+  ref: "Comment",
+  localField: "_id",
+  foreignField: "postId",
+  count: true,
+});
+
+export const FoodPost = model("FoodPost", FoodPostSchema);

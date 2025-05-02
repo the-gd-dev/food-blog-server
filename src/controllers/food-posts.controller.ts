@@ -15,10 +15,9 @@ import { Request, Response } from "express";
  */
 export const getAll = async (req: Request, res: Response) => {
   try {
-    const allFoodPosts = await FoodPost.find({}, "-__v").populate(
-      "postedBy",
-      "name profilePicture"
-    );
+    const allFoodPosts = await FoodPost.find({}, "-__v")
+      .populate("postedBy", "name profilePicture")
+      .populate("comments");
     return res
       .status(SUCCESS.code)
       .json({ ...SUCCESS, data: allFoodPosts.map((f) => f.toObject()) });
@@ -66,10 +65,9 @@ export const createPost = async (req: Request, res: Response) => {
  */
 export const getPost = async (req: Request, res: Response) => {
   try {
-    const foodPost = await FoodPost.findById(req.params.id).populate(
-      "postedBy",
-      "name profilePicture"
-    );
+    const foodPost = await FoodPost.findById(req.params.id)
+      .populate("postedBy", "name profilePicture")
+      .populate("comments");
 
     if (!foodPost) {
       return res

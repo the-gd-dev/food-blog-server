@@ -20,11 +20,4 @@ const UserSchema = new Schema(
   { timestamps: true }
 );
 
-UserSchema.set("toJSON", {
-  transform: function (_, ret) {
-    ret._id = ret._id.toString();
-    return ret._id;
-  },
-});
-
 export const User = model("User", UserSchema);
