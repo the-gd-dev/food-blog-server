@@ -1,4 +1,4 @@
-import { createComment, deleteComment, getAllComments } from "@controllers";
+import { createComment, deleteComment } from "@controllers";
 import { authenticateUser } from "@middlewares";
 import { Router } from "express";
 const router = Router();
