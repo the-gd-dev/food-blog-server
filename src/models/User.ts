@@ -2,11 +2,12 @@ import { Schema, model } from "mongoose";
 
 const UserSchema = new Schema(
   {
-    username: { type: String, unique: true },
+    username: { type: String, unique: true, sparse: true },
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     profilePicture: { type: String, default: null },
+    cover: { type: String, default: null },
     bio: { type: String, default: null },
     niche: { type: String, default: null },
     location: { type: String, default: null },

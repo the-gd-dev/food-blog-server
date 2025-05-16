@@ -1,13 +1,6 @@
-import {
-  AUTHORIZED,
-  BAD_REQUEST,
-  CREATED,
-  NOT_FOUND,
-  SUCCESS,
-  UNAUTHORIZED,
-} from "@constants";
+import { AUTHORIZED, BAD_REQUEST, CREATED, NOT_FOUND, SUCCESS, UNAUTHORIZED } from "@constants";
 import { RevokedToken, User } from "@models";
-import { formattedYupErrors, loginSchema, registerSchema } from "@utils";
+import { excludeKeysFromObject, formattedYupErrors, loginSchema, registerSchema } from "@utils";
 import argon2 from "argon2";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
@@ -33,17 +26,13 @@ export const login = async (req: Request, res: Response) => {
 
     // user details not found in db
     if (!user) {
-      return res
-        .status(NOT_FOUND.code)
-        .json({ ...NOT_FOUND, message: USER_NOT_FOUND });
+      return res.status(NOT_FOUND.code).json({ ...NOT_FOUND, message: USER_NOT_FOUND });
     }
 
     // password hash not matched!
     const isValidPass = await argon2.verify(user.password, password);
     if (!isValidPass) {
-      return res
-        .status(BAD_REQUEST.code)
-        .json({ ...BAD_REQUEST, message: USER_NOT_FOUND });
+      return res.status(BAD_REQUEST.code).json({ ...BAD_REQUEST, message: USER_NOT_FOUND });
     }
     const jwtToken = jwt.sign(
       {
@@ -57,9 +46,7 @@ export const login = async (req: Request, res: Response) => {
       ...SUCCESS,
       data: {
         token: jwtToken,
-        expiresIn: new Date(
-          Date.now() + 30 * 24 * 60 * 60 * 1000
-        ).toISOString(),
+        expiresIn: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       },
     });
   } catch (err: any) {
@@ -89,6 +76,8 @@ export const register = async (req: Request, res: Response) => {
     return res.status(CREATED.code).json({ ...CREATED, data: {} });
   } catch (err: any) {
     if (err.code === 11000) {
+      console.log(err);
+      
       return res.status(BAD_REQUEST.code).json({
         ...BAD_REQUEST,
         errors: { email: ["Please use a different email address."] },
@@ -143,12 +132,7 @@ export const verify = async (req: Request, res: Response) => {
   }
   res.status(AUTHORIZED.code).json({
     ...AUTHORIZED,
-    data: {
-      name: userData?.name ?? "",
-      username: userData?.username ?? "",
-      email: userData?.email ?? "",
-      profilePicture: userData?.profilePicture ?? "",
-    },
+    data: excludeKeysFromObject(userData?.toObject() as any, ["__v", "password"]),
   });
 };
 
@@ -183,7 +167,5 @@ export const logout = async (req: Request, res: Response) => {
     });
   }
 
-  res
-    .status(SUCCESS.code)
-    .json({ ...SUCCESS, message: "User logged out successfully!" });
+  res.status(SUCCESS.code).json({ ...SUCCESS, message: "User logged out successfully!" });
 };
