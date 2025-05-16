@@ -77,10 +77,10 @@ export const register = async (req: Request, res: Response) => {
   } catch (err: any) {
     if (err.code === 11000) {
       console.log(err);
-      
+
       return res.status(BAD_REQUEST.code).json({
         ...BAD_REQUEST,
-        errors: { email: ["Please use a different email address."] },
+        errors: { email: "Please use a different email address." },
       });
     }
     const validation = formattedYupErrors(err);
